@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বাংলাদেশ পোস্ট কোড ম্যানেজার</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #003973, #00c6a2);
+      color: #fff;
+    }
+    header {
+      text-align: center;
+      padding: 30px 20px 10px;
+    }
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    header p {
+      font-size: 14px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+    .search-section {
+      background: #fff;
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      max-width: 420px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 10px;
+    }
+    .search-section input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      outline: none;
+    }
+    .search-section button {
+      background: #ff4500;
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .result-card {
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      color: #000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none;
+    }
+    .result-header {
+      background: #0074d9;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px;
+    }
+    .result-body {
+      padding: 14px 16px;
+      line-height: 1.6;
+    }
+    .result-body p {
+      margin: 6px 0;
+    }
+    #noResult {
+      text-align: center;
+      color: yellow;
+      font-weight: bold;
+      margin-top: 20px;
+      display: none;
+    }
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      background: #004d40;
+      color: #ccc;
+    }
+    footer a {
+      color: #ffcccb;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📍 বাংলাদেশ পোস্ট কোড ম্যানেজার</h1>
+    <p>আপনার পোস্টাল কোড সহজেই ম্যানেজ করুন<br>সার্চ করুন, যোগ করুন, সম্পাদনা করুন এবং ইমপোর্ট করুন</p>
+  </header>  <div class="search-section">
+    <input type="text" id="searchBox" placeholder="এলাকার নাম বা পোস্ট কোড লিখুন..." onkeydown="if(event.key === 'Enter'){searchPostCode()}">
+    <button onclick="searchPostCode()">🔍 খুঁজুন</button>
+  </div>  <div id="resultCard" class="result-card">
+    <div class="result-header">রেজাল্ট</div>
+    <div class="result-body">
+      <p><strong>পোস্ট কোড:</strong> <span id="resCode"></span></p>
+      <p><strong>জেলা:</strong> <span id="resDistrict"></span></p>
+      <p><strong>থানা:</strong> <span id="resSubdistrict"></span></p>
+      <p><strong>পোস্ট অফিস:</strong> <span id="resOffice"></span></p>
+      <p><strong>বিবরণ:</strong> <span id="resDescription"></span></p>
+    </div>
+  </div>  <div id="noResult">❌ কোনো ফলাফল পাওয়া যায়নি</div>  <footer>
+    © ২০২৩ বাংলাদেশ পোস্ট কোড ম্যানেজার<br>
+    সকল অধিকার সংরক্ষিত<br>
+    এই ওয়েব ডাটাবেইজ টি তৈরি করেছেন: এমদাদুল হক সবুজ | 
+    <a href="https://www.facebook.com/esabuj" target="_blank">Fb: esabuj</a>
+  </footer>  <script>
+    const sheetID = '1N441xdFeNeKlrIG1m9niUwrLslW5RIsDPm3NFt7eges';
+    const sheetGID = '0';
+    const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&gid=${sheetGID}`;
+    let data = [];
+
+    async function fetchData() {
+      const resp = await fetch(sheetURL);
+      const text = await resp.text();
+      const json = JSON.parse(text.substr(47).slice(0, -2));
+      const rows = json.table.rows;
+      data = rows.map(r => ({
+        district: r.c[0]?.v || '',
+        subdistrict: r.c[1]?.v || '',
+        office: r.c[2]?.v || '',
+        code: r.c[3]?.v?.toString() || '',
+        description: `${r.c[2]?.v || ''} ${r.c[1]?.v || ''}, ${r.c[0]?.v || ''}`
+      }));
+    }
+    fetchData();
+
+    function searchPostCode() {
+      const query = document.getElementById('searchBox').value.toLowerCase();
+      const result = data.find(row => row.subdistrict.toLowerCase().includes(query) || row.office.toLowerCase().includes(query) || row.code.includes(query));
+
+      if (result) {
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('resCode').textContent = result.code;
+        document.getElementById('resDistrict').textContent = result.district;
+        document.getElementById('resSubdistrict').textContent = result.subdistrict;
+        document.getElementById('resOffice').textContent = result.office;
+        document.getElementById('resDescription').textContent = result.description;
+        document.getElementById('noResult').style.display = 'none';
+      } else {
+        document.getElementById('resultCard').style.display = 'none';
+        document.getElementById('noResult').style.display = 'block';
+      }
+    }
+  </script></body>
+</html>
