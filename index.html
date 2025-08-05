@@ -1,158 +1,321 @@
-<!DOCTYPE html><html lang="bn">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>বাংলাদেশ পোস্ট কোড ম্যানেজার</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #003973, #00c6a2);
-      color: #fff;
-    }
-    header {
-      text-align: center;
-      padding: 30px 20px 10px;
-    }
-    header h1 {
-      font-size: 24px;
-      margin: 0;
-    }
-    header p {
-      font-size: 14px;
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-    .search-section {
-      background: #fff;
-      padding: 20px;
-      margin: 20px auto;
-      border-radius: 12px;
-      max-width: 420px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      display: flex;
-      gap: 10px;
-    }
-    .search-section input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-      outline: none;
-    }
-    .search-section button {
-      background: #ff4500;
-      color: #fff;
-      border: none;
-      padding: 12px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    .result-card {
-      max-width: 420px;
-      margin: 0 auto;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #fff;
-      color: #000;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: none;
-    }
-    .result-header {
-      background: #0074d9;
-      color: #fff;
-      font-size: 18px;
-      font-weight: bold;
-      padding: 12px;
-    }
-    .result-body {
-      padding: 14px 16px;
-      line-height: 1.6;
-    }
-    .result-body p {
-      margin: 6px 0;
-    }
-    #noResult {
-      text-align: center;
-      color: yellow;
-      font-weight: bold;
-      margin-top: 20px;
-      display: none;
-    }
-    footer {
-      margin-top: 40px;
-      padding: 20px;
-      text-align: center;
-      font-size: 14px;
-      background: #004d40;
-      color: #ccc;
-    }
-    footer a {
-      color: #ffcccb;
-      text-decoration: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>বাংলাদেশ পোস্ট কোড ম্যানেজার</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+  /* Base & Variables */
+  :root {
+    --bg-color: #0b132b;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-color: #e0e0e0;
+    --primary-color-start: #0077b6;
+    --primary-color-end: #00b4d8;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --glass-blur: 15px;
+  }
+  
+  body {
+    margin: 0;
+    background: var(--bg-color);
+    font-family: 'Arial', sans-serif;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Decorative Background Circles */
+  body::before, body::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, var(--primary-color-start), var(--primary-color-end));
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.5;
+  }
+  body::before {
+    top: -50px;
+    left: -50px;
+  }
+  body::after {
+    bottom: -50px;
+    right: -50px;
+    background: linear-gradient(-135deg, #ff6b6b, #ffda79);
+  }
+
+  /* Main App Container */
+  .app-container {
+    width: 95%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px; /* দুটি কার্ড এবং টাইটেলের মধ্যে ফাঁকা জায়গা */
+  }
+
+  /* Main Header & Title */
+  .main-header {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 25px; /* সার্চ কার্ড থেকে ব্যবধান */
+  }
+  .main-header .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary-color-start), var(--primary-color-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+  .main-header .subtitle {
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-top: 5px;
+  }
+
+  /* Card Styles */
+  .card {
+    width: 100%;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: 25px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px var(--shadow-color);
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  
+  .search-group {
+    width: 100%;
+    position: relative;
+  }
+  .search-group input[type=text] {
+    width: 100%;
+    padding: 18px 20px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+  }
+  .search-group input[type=text]:focus {
+    border-color: var(--primary-color-end);
+    box-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+  }
+  .search-group button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(45deg, var(--primary-color-start), var(--primary-color-end));
+    border: none;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* Result Section */
+  #result {
+    display: none;
+    padding: 0;
+  }
+  #result .result-header {
+    background: linear-gradient(90deg, var(--primary-color-start), var(--primary-color-end));
+    padding: 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+  .result-body {
+    padding: 20px;
+    background: var(--card-bg);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 1rem;
+  }
+  .result-item:last-child {
+    border-bottom: none;
+  }
+  .result-item strong {
+    font-weight: 600;
+  }
+  .result-item span {
+    text-align: right;
+  }
+  
+  #noResult {
+    display: none;
+    margin-top: 20px;
+    color: #ffda79;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+  }
+  
+  /* Footer - as requested, unchanged */
+  footer {
+    margin-top: auto;
+    padding: 20px 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #ccc;
+  }
+  footer .profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  footer img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    margin-bottom: 8px;
+  }
+  footer a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffcccb;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>📍 বাংলাদেশ পোস্ট কোড ম্যানেজার</h1>
-    <p>আপনার পোস্টাল কোড সহজেই ম্যানেজ করুন<br>সার্চ করুন, যোগ করুন, সম্পাদনা করুন এবং ইমপোর্ট করুন</p>
-  </header>  <div class="search-section">
-    <input type="text" id="searchBox" placeholder="এলাকার নাম বা পোস্ট কোড লিখুন..." onkeydown="if(event.key === 'Enter'){searchPostCode()}">
-    <button onclick="searchPostCode()">🔍 খুঁজুন</button>
-  </div>  <div id="resultCard" class="result-card">
+
+<div class="app-container">
+  <header class="main-header">
+    <div class="title">
+      <i class="fas fa-map-marker-alt"></i>
+      বাংলাদেশ পোস্ট কোড ম্যানেজার
+    </div>
+    <div class="subtitle">আপনার পোস্টাল কোড সহজে খুঁজুন এখানে</div>
+  </header>
+  
+  <div class="card search-card">
+    <div class="search-group">
+      <input type="text" id="searchBox" placeholder="এলাকার নাম বা পোস্ট কোড লিখুন..." onkeydown="if(event.key==='Enter'){searchPostCode()}">
+      <button onclick="searchPostCode()">
+        <i class="fas fa-search"></i> খুঁজুন
+      </button>
+    </div>
+  </div>
+
+  <div id="result" class="card">
     <div class="result-header">রেজাল্ট</div>
     <div class="result-body">
-      <p><strong>পোস্ট কোড:</strong> <span id="resCode"></span></p>
-      <p><strong>জেলা:</strong> <span id="resDistrict"></span></p>
-      <p><strong>থানা:</strong> <span id="resSubdistrict"></span></p>
-      <p><strong>পোস্ট অফিস:</strong> <span id="resOffice"></span></p>
-      <p><strong>বিবরণ:</strong> <span id="resDescription"></span></p>
+      <div class="result-item">
+        <strong>পোস্ট কোড:</strong> <span id="resCode"></span>
+      </div>
+      <div class="result-item">
+        <strong>জেলা:</strong> <span id="resDistrict"></span>
+      </div>
+      <div class="result-item">
+        <strong>থানা:</strong> <span id="resSubdistrict"></span>
+      </div>
+      <div class="result-item">
+        <strong>পোস্ট অফিস:</strong> <span id="resOffice"></span>
+      </div>
     </div>
-  </div>  <div id="noResult">❌ কোনো ফলাফল পাওয়া যায়নি</div>  <footer>
-    © ২০২৩ বাংলাদেশ পোস্ট কোড ম্যানেজার<br>
-    সকল অধিকার সংরক্ষিত<br>
-    এই ওয়েব ডাটাবেইজ টি তৈরি করেছেন: এমদাদুল হক সবুজ | 
-    <a href="https://www.facebook.com/esabuj" target="_blank">Fb: esabuj</a>
-  </footer>  <script>
-    const sheetID = '1N441xdFeNeKlrIG1m9niUwrLslW5RIsDPm3NFt7eges';
-    const sheetGID = '0';
-    const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&gid=${sheetGID}`;
-    let data = [];
+  </div>
 
-    async function fetchData() {
+  <div id="noResult">❌ কোনো ফলাফল পাওয়া যায়নি</div>
+</div>
+
+<footer>
+  <div class="profile">
+    <img src="https://i.ibb.co/dJfq9mjt/20250513-055404.jpg" alt="FB Profile Pic" />
+    <a href="https://facebook.com/esabuj" target="_blank"><i class="fab fa-facebook"></i> Facebook Profile</a>
+  </div>
+  <div>&copy; ২০২৩ বাংলাদেশ পোস্ট কোড ম্যানেজার</div>
+</footer>
+
+<script>
+  // গুগল শিটের URL
+  const sheetID = '1N441xdFeNeKlrIG1m9niUwrLslW5RIsDPm3NFt7eges'; // আপনার গুগল শিট আইডি
+  const sheetGID = '0'; // গিট GID
+  const sheetURL = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?gid=${sheetGID}`;
+
+  let data = [];
+
+  async function fetchData() {
+    try {
       const resp = await fetch(sheetURL);
       const text = await resp.text();
-      const json = JSON.parse(text.substr(47).slice(0, -2));
-      const rows = json.table.rows;
-      data = rows.map(r => ({
+      const jsonStr = text.substr(47).slice(0, -2);
+      const json = JSON.parse(jsonStr);
+      data = json.table.rows.map(r => ({
         district: r.c[0]?.v || '',
         subdistrict: r.c[1]?.v || '',
         office: r.c[2]?.v || '',
         code: r.c[3]?.v?.toString() || '',
         description: `${r.c[2]?.v || ''} ${r.c[1]?.v || ''}, ${r.c[0]?.v || ''}`
       }));
+    } catch (error) {
+      console.error("ডেটা লোডে সমস্যা:", error);
     }
-    fetchData();
+  }
+  fetchData();
 
-    function searchPostCode() {
-      const query = document.getElementById('searchBox').value.toLowerCase();
-      const result = data.find(row => row.subdistrict.toLowerCase().includes(query) || row.office.toLowerCase().includes(query) || row.code.includes(query));
+  function searchPostCode() {
+    const query = document.getElementById('searchBox').value.toLowerCase().trim();
+    const resultElement = document.getElementById('result');
+    const noResultElement = document.getElementById('noResult');
 
-      if (result) {
-        document.getElementById('resultCard').style.display = 'block';
-        document.getElementById('resCode').textContent = result.code;
-        document.getElementById('resDistrict').textContent = result.district;
-        document.getElementById('resSubdistrict').textContent = result.subdistrict;
-        document.getElementById('resOffice').textContent = result.office;
-        document.getElementById('resDescription').textContent = result.description;
-        document.getElementById('noResult').style.display = 'none';
-      } else {
-        document.getElementById('resultCard').style.display = 'none';
-        document.getElementById('noResult').style.display = 'block';
-      }
+    const result = data.find(r =>
+      r.subdistrict.toLowerCase().includes(query) ||
+      r.office.toLowerCase().includes(query) ||
+      r.code.includes(query)
+    );
+
+    if (result) {
+      document.getElementById('resCode').textContent = result.code;
+      document.getElementById('resDistrict').textContent = result.district;
+      document.getElementById('resSubdistrict').textContent = result.subdistrict;
+      document.getElementById('resOffice').textContent = result.office;
+      
+      resultElement.style.display = 'block';
+      noResultElement.style.display = 'none';
+    } else {
+      resultElement.style.display = 'none';
+      noResultElement.style.display = 'block';
     }
-  </script></body>
+  }
+</script>
+
+</body>
 </html>
